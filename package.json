@@ -1,0 +1,30 @@
+{
+  "name": "briq-core",
+  "version": "1.0.0",
+  "description": "Smart contracts for Briq DeFi yield optimization protocol",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx hardhat test",
+    "test:coverage": "npx hardhat coverage",
+    "compile": "npx hardhat compile",
+    "clean": "npx hardhat clean"
+  },
+  "keywords": ["defi", "yield", "optimization", "ethereum", "arbitrum"],
+  "author": "Briq Protocol",
+  "license": "UNLICENSED",
+  "type": "module",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.0.5",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.1",
+    "@types/node": "^22.19.1",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.7",
+    "hardhat": "^3.0.14",
+    "typescript": "~5.8.0",
+    "viem": "^2.39.0"
+  },
+  "dependencies": {
+    "@chainlink/contracts": "^1.5.0",
+    "@openzeppelin/contracts": "^5.4.0",
+    "@pythnetwork/pyth-sdk-solidity": "^4.2.0"
+  }
+}
