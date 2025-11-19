@@ -1,49 +1,34 @@
-# Briq Core Smart Contracts
+# briq-core
 
-Production-ready smart contracts for the Briq DeFi yield optimization protocol.
-
-## Overview
-
-Briq Core contains the foundational smart contracts that power the Briq protocol's yield optimization functionality:
-
-- **PriceFeedManager**: Manages price feeds from Chainlink and Pyth Network with automatic fallback mechanisms
-- **BriqShares**: ERC20 token representing ownership shares in the Briq yield optimization vault
+briq-core contains the foundational smart contracts that power the Briq protocol.
 
 ## Features
 
-- **Multi-Oracle Price Feeds**: Chainlink primary with Pyth Network fallback
-- **Gas Optimized**: Compiler optimization enabled with 200 runs for deployment efficiency
-- **100% Test Coverage**: Comprehensive test suite with 35/35 tests passing
-- **Arbitrum Integration**: Configured for Arbitrum mainnet deployment with forking support
+- **PriceFeedManager**: Dual-oracle price feed system with Chainlink primary + Pyth Network fallback
+- **BriqTimelock**: OpenZeppelin TimelockController with 48-hour delay for governance operations
+- **Dual-Oracle Price Feeds**: Chainlink primary with Pyth Network automatic fallback
+- **Governance Security**: 48-hour timelock for critical operations
+- **Gas Optimized**: Custom errors and compiler optimization for deployment efficiency
+- **100% Test Coverage**: Comprehensive test suite with TypeScript integration
+- **Arbitrum Integration**: Real oracle testing on forked Arbitrum mainnet
+
+## Contracts
+
+- **PriceFeedManager**: 100% tested, dual-oracle system
+- **BriqTimelock**: Secure timelock implementation with OpenZeppelin base
+- **BriqShares**: 100% tested, optimized, secure ERC20 implementation
 
 ## Usage
 
 ### Running Tests
 
-Run the complete test suite:
-
 ```shell
-npx hardhat test
-```
-
-Run Solidity tests only:
-
-```shell
-npx hardhat test solidity
-```
-
-### Test Coverage
-
-Generate coverage report:
-
-```shell
-npx hardhat coverage
+npm test test/fileName --network hardhat
 ```
 
 ### Deployment
 
-Deploy to Arbitrum mainnet (requires ALCHEMY_API_KEY and PRIVATE_KEY in .env):
-
+Deploy to Arbitrum mainnet:
 ```shell
 npx hardhat ignition deploy ignition/modules/BriqCore.ts --network arbitrum
 ```
@@ -51,19 +36,58 @@ npx hardhat ignition deploy ignition/modules/BriqCore.ts --network arbitrum
 ## Architecture
 
 ### PriceFeedManager
-- Manages price feeds for supported tokens (USDC, WETH)
-- Automatic failover from Chainlink to Pyth Network
-- Configurable staleness thresholds
-- 8-decimal precision normalization
+- **Dual-Oracle System**: Chainlink (1-hour staleness) + Pyth (20-second staleness)
+- **Automatic Fallback**: Seamless failover when primary oracle is stale
+- **Price Validation**: Sanity checks, round data validation, temporal verification
+- **USD Conversion**: getTokenValueInUSD, convertUsdToToken utility functions
+- **Access Control**: Owner/timelock restricted configuration
+
+### BriqTimelock
+- **OpenZeppelin Base**: Inherits battle-tested TimelockController
+- **48-Hour Delay**: Security buffer for critical operations
+- **Custom Errors**: Gas-optimized NotAdmin() error
+- **Role Management**: Proper admin and executor role handling
 
 ### BriqShares
-- ERC20 token representing vault ownership
-- Mint/burn functionality for vault operations
-- Standard transferability for DeFi composability
+- **ERC20 Standard**: Full compatibility with DeFi ecosystem
+- **Vault Integration**: Mint/burn functionality for vault operations
+- **Access Control**: Vault-only minting with owner configuration
+- **Gas Optimized**: Custom errors and efficient storage patterns
 
 ## Security
 
-- Comprehensive test coverage with fuzz testing
-- Gas optimization with unchecked blocks for safe operations
-- Audit checklist completed and documented
-- Production-ready compiler settings
+### Completed Security Measures
+- ✅ **Dual-Oracle Protection**: Eliminates single point of failure
+- ✅ **Staleness Validation**: Prevents stale price data usage
+- ✅ **Access Control**: Timelock integration for critical functions
+- ✅ **Custom Errors**: Gas-efficient error handling
+- ✅ **Comprehensive Testing**: 100% coverage with real oracle data
+
+## Development
+
+### Prerequisites
+- Node.js 18+
+- Hardhat
+- TypeScript
+- Alchemy API key for Arbitrum forking
+
+### Environment Setup
+```shell
+# Install dependencies
+npm install
+
+# Set up Hardhat keystore for secure secret management
+# For development environment variables, add --dev
+# Add your Alchemy API key (required for Arbitrum forking in tests)
+npx hardhat keystore set ARBITRUM_RPC_URL
+# Enter your Alchemy API key when prompted
+
+# For deployment, add private key (optional)
+npx hardhat keystore set PRIVATE_KEY
+# Enter your private key when prompted
+
+# Verify keystore setup
+npx hardhat keystore list
+```
+
+**Note**: The keystore encrypts and stores secrets locally. Tests and deployment will automatically use these values from the keystore without needing `.env` files.

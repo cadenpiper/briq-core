@@ -52,8 +52,11 @@ contract PriceFeedManager is Ownable {
     /// @notice Pyth Network contract interface
     IPyth public pythContract;
 
-    /// @notice Maximum age for price data (1 hour)
-    uint256 public constant STALENESS_THRESHOLD = 1 hours;
+    /// @notice Maximum age for Chainlink price data (1 hour)
+    uint256 public constant CHAINLINK_STALENESS_THRESHOLD = 1 hours;
+    
+    /// @notice Maximum age for Pyth price data (20 seconds)  
+    uint256 public constant PYTH_STALENESS_THRESHOLD = 20 seconds;
 
     /// @notice Thrown when token address is zero
     error InvalidTokenAddress();
@@ -177,7 +180,7 @@ contract PriceFeedManager is Ownable {
         // Validate price data
         if (answer <= 0) revert InvalidPrice();
         if (answeredInRound < roundId) revert InvalidPrice();
-        if (updatedAt == 0 || block.timestamp - updatedAt > STALENESS_THRESHOLD) {
+        if (updatedAt == 0 || block.timestamp - updatedAt > CHAINLINK_STALENESS_THRESHOLD) {
             revert StalePrice();
         }
 
@@ -197,7 +200,7 @@ contract PriceFeedManager is Ownable {
         
         // Validate price data
         if (pythPrice.price <= 0) revert InvalidPrice();
-        if (block.timestamp - pythPrice.publishTime > STALENESS_THRESHOLD) {
+        if (block.timestamp - pythPrice.publishTime > PYTH_STALENESS_THRESHOLD) {
             revert StalePrice();
         }
 
@@ -217,7 +220,7 @@ contract PriceFeedManager is Ownable {
             
             // Negative exponent: basePrice * 10^8 / 10^absExpo
             if (absExpo == 8) {
-                return basePrice * 1e8;
+                return basePrice;
             } else if (absExpo > 8) {
                 return basePrice / (10 ** (absExpo - 8));
             } else {
